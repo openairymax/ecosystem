@@ -1,0 +1,15 @@
+[submodule "manager"]
+	path = manager
+	url = git@atomgit.com:openairymax/manager.git
+[submodule "prompts"]
+	path = prompts
+	url = git@atomgit.com:openairymax/prompts.git
+[submodule "examples"]
+	path = examples
+	url = git@atomgit.com:openairymax/examples.git
+[submodule "openlab"]
+	path = openlab
+	url = git@atomgit.com:openairymax/openlab.git
+[submodule "skills"]
+	path = skills
+	url = git@atomgit.com:openairymax/skills.git
