@@ -1,40 +1,85 @@
-# Airymax Ecosystem
+# Airymax Ecosystem — Engineering Ecosystem Components
 
-> Airymax 生态管理仓库
+> Engineering ecosystem layer for the Airymax AI Agent Runtime Platform.
+> One of four management repositories under the [airymaxhub](https://atomgit.com/openairymax/airymaxhub) umbrella.
 
-## 概述
+**Language:** English | [简体中文](README_zh.md)
 
-Ecosystem 管理仓聚合 Airymax 的工程生态组件，包括生态管理器、提示词库、示例集合、开放实验室和技能定义。
+[![Version](https://img.shields.io/badge/version-0.1.1-5a6b7e)](https://atomgit.com/openairymax/ecosystem)
+[![License](https://img.shields.io/badge/license-AGPL--3.0+Apache--2.0-4a90d9)](LICENSE)
 
-## 子模块
+---
 
-| 模块 | 仓库 | 说明 |
-|------|------|------|
-| Manager | `git@atomgit.com:openairymax/manager.git` | 生态管理器（配置/部署/监控/schema） |
-| Prompts | `git@atomgit.com:openairymax/prompts.git` | 提示词注册与调优 |
-| Examples | `git@atomgit.com:openairymax/examples.git` | 示例 Agent 集合 |
-| OpenLab | `git@atomgit.com:openairymax/openlab.git` | 开放实验室 |
-| Skills | `git@atomgit.com:openairymax/skills.git` | 技能定义与实现 |
+## Overview
 
-## 架构
+The **Ecosystem management repo** aggregates Airymax's engineering ecosystem components: ecosystem manager, prompt library, example agents, open lab, and skill definitions. These components sit at the top of the Airymax architecture, providing user-facing tools, configurations, and reference implementations.
+
+## Leaf Repositories
+
+| Module | Repository | Description |
+|--------|-----------|-------------|
+| **manager** | `git@atomgit.com:openairymax/manager.git` | Ecosystem manager: configs, schemas, sanitizer suppressions, deployment scripts |
+| **prompts** | `git@atomgit.com:openairymax/prompts.git` | Prompt template library + evaluation/tuning framework |
+| **examples** | `git@atomgit.com:openairymax/examples.git` | Official example Agent collection |
+| **openlab** | `git@atomgit.com:openairymax/openlab.git` | Open lab (experimental features, research prototypes) |
+| **skills** | `git@atomgit.com:openairymax/skills.git` | Official skill definitions (SkillPlugin base class) |
+
+## Architecture
 
 ```
 ecosystem/
-├── manager/    # 生态管理器（sanitizer/schema/security/configs）
-├── prompts/    # 提示词模板库 + 评估调优框架
-├── examples/   # 官方示例 Agent
-├── openlab/    # 开放实验室（实验性功能）
-└── skills/     # 官方技能集合（SkillPlugin 基类）
+├── manager/    # Ecosystem manager (sanitizer / schema / security / configs)
+├── prompts/    # Prompt template library + evaluation tuning framework
+├── examples/   # Official example agents
+├── openlab/    # Open lab (experimental features)
+├── skills/     # Official skill collection (SkillPlugin base class)
+├── .gitmodules
+└── README.md   ← This file
 ```
 
-> **注意**: 官方 Hook 集合（原 `ecosystem/hooks/`）已于 SP09.3 迁移至 `sdk-python/agentrt/hooks/`，import 路径变更为 `from agentrt.hooks import ...`
+### Upstream Dependencies
 
-## 仓库信息
+- **Runtime**: Connects to a running AgentRT instance via SDK (`sdk/`)
+- **Configuration**: `manager/` provides deployment configs consumed by the runtime
+- **Sanitizer**: `manager/sanitizer/` provides ASan/LSan/UBSan suppression files used during build
 
-- **仓库 URL**: `git@atomgit.com:openairymax/ecosystem.git`
-- **归属组织**: openairymax
-- **分支策略**: 仅 `main` 分支
-- **许可证**: AGPL v3 + Apache 2.0 双许可证
+### Downstream Consumers
 
-Copyright (c) 2025-2026 SPHARX Ltd. All Rights Reserved.
-SPDX-License-Identifier: AGPL-3.0-or-later OR Apache-2.0
+- **Agent developers**: Use `prompts/` and `skills/` as building blocks
+- **Operators**: Use `manager/` configs for deployment
+- **Researchers**: Use `openlab/` for experimental features
+
+> **Note**: The official Hooks collection (formerly `ecosystem/hooks/`) was migrated to `sdk-python/agentrt/hooks/` during SP09.3. Import path changed to `from agentrt.hooks import ...`.
+
+## Repository Structure
+
+```
+ecosystem/
+├── manager/
+│   ├── sanitizer/     # ASan/LSan/UBSan suppression files
+│   ├── schema/        # JSON/YAML schemas for configuration validation
+│   ├── security/      # Security policies and RBAC rules
+│   └── configs/       # Deployment configuration templates
+├── prompts/
+│   ├── templates/     # Prompt templates
+│   └── evaluation/    # Evaluation and tuning framework
+├── examples/
+│   └── (example agents)
+├── openlab/
+│   └── (experimental features)
+├── skills/
+│   ├── base/          # SkillPlugin base class
+│   └── official/      # Official skill implementations
+└── README.md
+```
+
+## Branch Strategy
+
+- This management repo: **`main`** only
+- Leaf repos: **`feature/official-hubs-01`** (active development)
+
+## License
+
+Dual-licensed under **AGPL v3 + Apache 2.0** (SPDX: `AGPL-3.0-or-later OR Apache-2.0`). See [LICENSE](LICENSE) for details.
+
+Copyright (c) 2025-2026 **SPHARX Ltd.** All Rights Reserved.
