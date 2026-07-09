@@ -61,7 +61,7 @@ The ecosystem layer is the second layer of the Airymax four-layer architecture. 
 │  12 runtime daemons (gateway_d / llm_d / tool_d / sched_d / ...)  │
 ├──────────────────────────────────────────────────────────────────┤
 │  Atoms                                                            │
-│  Microkernel primitives (corekern / coreloopthree / syscall / ...)│
+│  Micro-core primitives (corekern / coreloopthree / syscall / ...)│
 └──────────────────────────────────────────────────────────────────┘
 ```
 
