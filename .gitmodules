@@ -1,20 +1,20 @@
 [submodule "manager"]
 	path = manager
 	url = ../manager.git
-	branch = feature/official-hubs-01
+	branch = develop/hubs-01
 [submodule "prompts"]
 	path = prompts
 	url = ../prompts.git
-	branch = feature/official-hubs-01
+	branch = develop/hubs-01
 [submodule "examples"]
 	path = examples
 	url = ../examples.git
-	branch = feature/official-hubs-01
+	branch = develop/hubs-01
 [submodule "openlab"]
 	path = openlab
 	url = ../openlab.git
-	branch = feature/official-hubs-01
+	branch = develop/hubs-01
 [submodule "skills"]
 	path = skills
 	url = ../skills.git
-	branch = feature/official-hubs-01
+	branch = develop/hubs-01
