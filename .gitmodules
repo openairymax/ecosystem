@@ -19,6 +19,6 @@
 	url = ../skills.git
 	branch = develop/hubs-01
 [submodule "agents"]
-	path = agents
-	url = ../agents.git
-	branch = develop/hubs-01
+        path = agents
+        url = ../agents.git
+        branch = main
