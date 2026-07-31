@@ -18,3 +18,7 @@
 	path = skills
 	url = ../skills.git
 	branch = develop/hubs-01
+[submodule "agents"]
+	path = agents
+	url = ../agents.git
+	branch = develop/hubs-01
