@@ -92,6 +92,12 @@ Each leaf repository plays a distinct role within the ecosystem layer:
 
 > **Note**: The official Hooks collection (formerly `ecosystem/hooks/`) was migrated to `sdk-python/agentrt/hooks/` during SP09.3. Import path changed to `from agentrt.hooks import ...`.
 
+### 0.1.1 Ecosystem Progress (Linked with AgentRT Framework-ization)
+
+- **Agents can be truly driven**: the agentrt Work Hall registers task-graph nodes as `agent:<role>` handlers and spawns/invokes this layer's `agents/` via `agent_d` (including Rust `coding_rs_v1`).
+- **Rust coding agent with LLM**: `agents/airymax_agents_rs` `coding_agent` (v0.2.0) supports the OpenAI-compatible protocol with a Mock fallback; latency benchmarks vs the Python implementation live under `agents/tests/`.
+- **LLM config SSoT consolidation**: `manager/model/model.yaml` (kept in sync with `model.json`) is the single source of truth for providers/models (with a `providers` section); the `llm` section in `manager/configs/agentrt.yaml` keeps only runtime policy (routing/cost/cache).
+
 ## Build & Usage
 
 The ecosystem layer ships Python tooling and configuration rather than compiled artifacts. Typical usage:

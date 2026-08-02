@@ -90,6 +90,12 @@ ecosystem/                 # 管理仓（本仓库）
 
 > **注意**：官方 Hook 集合（原 `ecosystem/hooks/`）已于 SP09.3 迁移至 `sdk-python/agentrt/hooks/`，import 路径变更为 `from agentrt.hooks import ...`。
 
+### 0.1.1 生态层进展（与 agentrt 框架化联动）
+
+- **Agent 可被真实驱动**：agentrt 工作大厅（Work Hall）以 `agent:<role>` handler 注册任务图节点，经 `agent_d` spawn/invoke 驱动本层 `agents/` 下的 Agent 执行（含 Rust `coding_rs_v1`）。
+- **Rust coding agent 接入 LLM**：`agents/airymax_agents_rs` 的 `coding_agent`（v0.2.0）支持 OpenAI 兼容协议 + Mock 降级，与 Python 实现的延迟对比基准位于 `agents/tests/`。
+- **LLM 配置 SSoT 收敛**：`manager/model/model.yaml`（同源 `model.json`）为提供商/模型唯一真相源（含 `providers` 段）；`manager/configs/agentrt.yaml` 的 `llm` 段仅保留运行时策略（路由/成本/缓存）。
+
 ## 构建与使用
 
 生态层交付 Python 工具和配置，而非编译产物。典型用法：
