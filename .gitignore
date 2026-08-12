@@ -18,5 +18,8 @@
 !examples
 !manager
 !openlab
+!plugins
+!plugins/**
+!plugins/**/build/
 !prompts
 !skills
