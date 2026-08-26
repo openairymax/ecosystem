@@ -13,9 +13,9 @@
 
 ## Overview
 
-The **`ecosystem` management repository** is the application-facing ecosystem layer of the Airymax platform. It aggregates **6 leaf repositories** as git submodules and provides the upper-layer ecosystem support that Agent applications consume at runtime — configuration management, prompt templates, reference examples, an open laboratory, official skill definitions, and built-in agent executors.
+The **`ecosystem` management repository** is the application-facing ecosystem layer of the Airymax platform. It aggregates **5 leaf repositories** as git submodules and provides the upper-layer ecosystem support that Agent applications consume at runtime — configuration management, prompt templates, the official package marketplace, official skill definitions, and built-in agent executors.
 
-Within the Airymax four-layer architecture (`Applications → Ecosystem → Daemon Services → Atoms`), the ecosystem layer sits between end-user applications and the runtime daemons. It is the layer where Agent developers spend most of their time: they write agents against the SDK, then register them with `manager/`, compose prompts from `prompts/`, learn from `examples/`, extend the platform via `openlab/`, and reuse official capabilities from `skills/`.
+Within the Airymax four-layer architecture (`Applications → Ecosystem → Daemon Services → Atoms`), the ecosystem layer sits between end-user applications and the runtime daemons. It is the layer where Agent developers spend most of their time: they write agents against the SDK, then register them with `manager/`, compose prompts from `prompts/`, install packages from `markets/`, and reuse official capabilities from `skills/` and `agents/`.
 
 This management repo only carries documentation, submodule wiring, and licensing. All implementation lives in the leaf repositories.
 
@@ -25,10 +25,9 @@ This management repo only carries documentation, submodule wiring, and licensing
 ecosystem/                 # Management repository (this repo)
 ├── manager/               # Ecosystem manager leaf repo (submodule)
 ├── prompts/               # Prompt library leaf repo (submodule)
-├── examples/              # Example agents leaf repo (submodule)
-├── openlab/               # Open lab leaf repo (submodule)
+├── markets/               # Official package marketplace leaf repo (submodule)
 ├── skills/                # Official skills leaf repo (submodule)
-├── agents/                # Built-in agent executors leaf repo (submodule, v0.2.0)
+├── agents/                # Built-in agent executors + orchestration leaf repo (submodule)
 ├── .gitmodules            # Submodule definitions
 ├── LICENSE                # AGPL-3.0 + Apache-2.0 dual license full text
 ├── NOTICE                 # Copyright, trademark and third-party notices
@@ -42,10 +41,9 @@ ecosystem/                 # Management repository (this repo)
 |--------|-----------|----------------|-------------|
 | **manager** | `manager/` | `git@atomgit.com:openairymax/manager.git` | Unified configuration & lifecycle management center — 11 JSON Schemas (~272 rules), 10 registered skills, 12 registered agents, 3 environment overlays (dev/staging/prod), sanitizer suppressions, security policies, deployment templates |
 | **prompts** | `prompts/` | `git@atomgit.com:openairymax/prompts.git` | Official prompt template library — 14 templates across 4 categories (Cognition / Memory / Security / System), registry, tuner framework (scorer / evaluator / A-B testing) |
-| **examples** | `examples/` | `git@atomgit.com:openairymax/examples.git` | Reference examples hub (graded learning path content under reorganization — YAML-based agent demos retired in v0.2.0; runnable Python examples live under `openlab/examples/minimal/`) |
-| **openlab** | `openlab/` | `git@atomgit.com:openairymax/openlab.git` | Open laboratory — multi-agent orchestration core (`Agent` / `LLMAgent` / `LLMClient` / `MockLLMClient`), `contrib/` strategies & skills, JSON-RPC 2.0 marketplace; role agents migrated to `agents/` submodule in v0.2.0 |
-| **skills** | `skills/` | `git@atomgit.com:openairymax/skills.git` | 5 official skills (code_review / text_summarization / security_audit / data_analysis / web_search) built on the `SkillPlugin` base class from `sdk-python` |
-| **agents** | `agents/` | `git@atomgit.com:openairymax/agents.git` | 7 built-in agent executors (product_manager / architect / backend / frontend / devops / security / tester) — each ships `contract.json` (per `01-agent-contract.md`) + `prompts/system.md` + `AirymaxAgent` subclass; mock-runnable end-to-end without API key |
+| **markets** | `markets/` | `git@atomgit.com:openairymax/markets.git` | Official package marketplace — installable `tool` packages (e.g. `maths-toolkit`), marketplace client SDK, agent/skill contract validators & installers, package templates, reference example agents & applications |
+| **skills** | `skills/` | `git@atomgit.com:openairymax/skills.git` | Official skills — 5 Python `SkillPlugin` skills (code_review / text_summarization / security_audit / data_analysis / web_search), 5 C plugin implementations, 3 contrib skills (browser / database / github), skill marketplace contract validators & installer |
+| **agents** | `agents/` | `git@atomgit.com:openairymax/agents.git` | Built-in agent executors — 11 role agents (product_manager / architect / backend / frontend / devops / security / tester / coding / data_engineer / reviewer / analyst) + Rust coding agent; each ships `contract.json` + `prompts/system.md` + `AirymaxAgent` subclass; **orchestration** framework (Agent / Task / Tool / Storage / LLMClient + dispatching & planning strategies) merged from the retired `openlab` leaf repo; mock-runnable end-to-end without API key |
 
 ## Ecosystem Architecture
 
@@ -57,7 +55,7 @@ The ecosystem layer is the second layer of the Airymax four-layer architecture. 
 │  End-user Agent apps built on ecosystem + SDK                    │
 ├──────────────────────────────────────────────────────────────────┤
 │  ★ Ecosystem (this management repo) ★                            │
-│  manager · prompts · examples · openlab · skills · agents        │
+│  manager · prompts · markets · skills · agents                   │
 ├──────────────────────────────────────────────────────────────────┤
 │  Daemon Services                                                  │
 │  12 runtime daemons (gateway_d / llm_d / tool_d / sched_d / ...)  │
@@ -73,9 +71,9 @@ Each leaf repository plays a distinct role within the ecosystem layer:
 |-----------|------|--------------|
 | **manager** | Configuration root — single source of truth | `configs/agentrt.yaml` (v0.1.1 unified runtime config) |
 | **prompts** | Prompt engineering — templates + evaluation | `registry.yaml` + tuner framework |
-| **examples** | Learning path — runnable reference agents | 10 example agents with graded difficulty |
-| **openlab** | Innovation surface — experimental & community | 4 reference applications + marketplace |
-| **skills** | Reusable capabilities — official skill pack | 5 `SkillPlugin` subclasses |
+| **markets** | Distribution — installable packages + marketplace client | `tools/maths-toolkit/` + `client/` |
+| **skills** | Reusable capabilities — official skill pack | 5 `SkillPlugin` subclasses + 5 C plugins |
+| **agents** | Built-in executors + orchestration kernel | 11 role agents + `orchestration/` framework |
 
 ### Upstream Dependencies
 
@@ -85,9 +83,9 @@ Each leaf repository plays a distinct role within the ecosystem layer:
 
 ### Downstream Consumers
 
-- **Agent developers** — use `prompts/` and `skills/` as building blocks; learn from `examples/`; deploy via `manager/` configs
+- **Agent developers** — use `prompts/` and `skills/` as building blocks; install packages from `markets/`; deploy via `manager/` configs
 - **Operators** — use `manager/` deployment templates and monitoring configs for production rollouts
-- **Researchers** — use `openlab/` for experimental features and community contributions
+- **Runtime** — `market_d` resolves packages from `markets/`; `agent_d` drives executors from `agents/`; `plugin_d` scans skill plugins from `skills/plugins/`
 - **CI / CD pipelines** — run `manager/tools/drift_detector.py` and `manager/tools/config_diff.py` as configuration validation gates
 
 > **Note**: The official Hooks collection (formerly `ecosystem/hooks/`) was migrated to `sdk-python/agentrt/hooks/` during SP09.3. Import path changed to `from agentrt.hooks import ...`.
