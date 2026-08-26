@@ -15,11 +15,7 @@
 !README.md
 !README_zh.md
 !agents
-!examples
 !manager
-!openlab
-!plugins
-!plugins/**
-!plugins/**/build/
+!markets
 !prompts
 !skills
