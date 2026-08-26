@@ -6,13 +6,9 @@
 	path = prompts
 	url = ../prompts.git
 	branch = develop/hubs-01
-[submodule "examples"]
-	path = examples
-	url = ../examples.git
-	branch = develop/hubs-01
-[submodule "openlab"]
-	path = openlab
-	url = ../openlab.git
+[submodule "markets"]
+	path = markets
+	url = ../markets.git
 	branch = develop/hubs-01
 [submodule "skills"]
 	path = skills
