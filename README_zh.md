@@ -128,7 +128,7 @@ python -m pytest skills/tests/ -v
 ## 分支策略
 
 - **本管理仓** — 仅 `main` 分支。不在此创建 feature 分支。
-- **叶子仓** — 活跃开发在 `feature/official-hubs-01` 分支上进行。各叶子仓的 `main` 分支跟踪最近一次稳定发布。
+- **叶子仓** — 活跃开发在 `develop/hubs-01` 分支上进行。各叶子仓的 `main` 分支跟踪最近一次稳定发布。
 
 克隆本仓库（含 submodule）：
 

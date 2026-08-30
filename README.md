@@ -39,7 +39,7 @@ ecosystem/                 # Management repository (this repo)
 
 | Module | Directory | Repository URL | Description |
 |--------|-----------|----------------|-------------|
-| **manager** | `manager/` | `git@atomgit.com:openairymax/manager.git` | Unified configuration & lifecycle management center — 11 JSON Schemas (~272 rules), 10 registered skills, 12 registered agents, 3 environment overlays (dev/staging/prod), sanitizer suppressions, security policies, deployment templates |
+| **manager** | `manager/` | `git@atomgit.com:openairymax/manager.git` | Unified configuration & lifecycle management center — 11 JSON Schemas (~272 rules), 15 registered skills, 14 registered agents, 3 environment overlays (dev/staging/prod), sanitizer suppressions, security policies, deployment templates |
 | **prompts** | `prompts/` | `git@atomgit.com:openairymax/prompts.git` | Official prompt template library — 14 templates across 4 categories (Cognition / Memory / Security / System), registry, tuner framework (scorer / evaluator / A-B testing) |
 | **markets** | `markets/` | `git@atomgit.com:openairymax/markets.git` | Official package marketplace — installable `tool` packages (e.g. `maths-toolkit`), marketplace client SDK, agent/skill contract validators & installers, package templates, reference example agents & applications |
 | **skills** | `skills/` | `git@atomgit.com:openairymax/skills.git` | Official skills — 5 Python `SkillPlugin` skills (code_review / text_summarization / security_audit / data_analysis / web_search), 5 C plugin implementations, 3 contrib skills (browser / database / github); distribution via `markets/` |
@@ -128,7 +128,7 @@ python -m pytest skills/tests/ -v
 ## Branch Strategy
 
 - **This management repo** — `main` only. No feature branches are created here.
-- **Leaf repositories** — active development happens on `feature/official-hubs-01`. The `main` branch on each leaf repo tracks the last stable release.
+- **Leaf repositories** — active development happens on `develop/hubs-01`. The `main` branch on each leaf repo tracks the last stable release.
 
 When cloning this repo with submodules:
 
