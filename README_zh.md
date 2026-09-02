@@ -85,7 +85,7 @@ ecosystem/                 # 管理仓（本仓库）
 
 - **Agent 开发者** — 使用 `prompts/` 和 `skills/` 作为构建块；从 `markets/` 安装分发包；通过 `manager/` 配置部署
 - **运维人员** — 使用 `manager/` 部署模板和监控配置进行生产环境部署
-- **运行时** — `market_d` 从 `markets/` 解析分发包；`agent_d` 驱动 `agents/` 的执行器；`plugin_d` 扫描 `skills/plugins/` 的技能插件
+- **运行时** — `market_d` 从 `markets/` 解析分发包；`agent_d` 驱动 `agents/` 的执行器；`tool_d`（M4 吸收 `plugin_d`）加载 `skills/plugins/` 的技能插件
 - **CI / CD 流水线** — 运行 `manager/tools/drift_detector.py` 和 `manager/tools/config_diff.py` 作为配置验证门禁
 
 > **注意**：官方 Hook 集合（原 `ecosystem/hooks/`）已于 SP09.3 迁移至 `sdk-python/agentrt/hooks/`，import 路径变更为 `from agentrt.hooks import ...`。
