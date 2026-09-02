@@ -85,7 +85,7 @@ Each leaf repository plays a distinct role within the ecosystem layer:
 
 - **Agent developers** — use `prompts/` and `skills/` as building blocks; install packages from `markets/`; deploy via `manager/` configs
 - **Operators** — use `manager/` deployment templates and monitoring configs for production rollouts
-- **Runtime** — `market_d` resolves packages from `markets/`; `agent_d` drives executors from `agents/`; `plugin_d` scans skill plugins from `skills/plugins/`
+- **Runtime** — `market_d` resolves packages from `markets/`; `agent_d` drives executors from `agents/`; `tool_d` loads skill plugins from `skills/plugins/` (M4 absorbed `plugin_d`)
 - **CI / CD pipelines** — run `manager/tools/drift_detector.py` and `manager/tools/config_diff.py` as configuration validation gates
 
 > **Note**: The official Hooks collection (formerly `ecosystem/hooks/`) was migrated to `sdk-python/agentrt/hooks/` during SP09.3. Import path changed to `from agentrt.hooks import ...`.
