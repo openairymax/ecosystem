@@ -5,7 +5,7 @@
 
 **语言:** [English](README.md) | 简体中文
 
-[![Version](https://img.shields.io/badge/version-0.1.1-5a6b7e)](https://atomgit.com/openairymax/ecosystem)
+[![Version](https://img.shields.io/badge/version-0.1.9-5a6b7e)](https://atomgit.com/openairymax/ecosystem)
 [![License](https://img.shields.io/badge/license-AGPL--3.0+Apache--2.0-4a90d9)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](https://www.python.org)
 
@@ -58,7 +58,7 @@ ecosystem/                 # 管理仓（本仓库）
 │  manager · prompts · markets · skills · agents                    │
 ├──────────────────────────────────────────────────────────────────┤
 │  Daemon Services（守护服务层）                                    │
-│  12 个运行时守护进程（gateway_d / llm_d / tool_d / sched_d / ...） │
+│  15 个运行时守护进程（gateway_d / llm_d / tool_d / sched_d / ...） │
 ├──────────────────────────────────────────────────────────────────┤
 │  Atoms（原子层）                                                  │
 │  微核心原语（corekern / coreloopthree / syscall / ...）           │
@@ -69,7 +69,7 @@ ecosystem/                 # 管理仓（本仓库）
 
 | 叶子仓 | 职责 | 关键产物 |
 |--------|------|----------|
-| **manager** | 配置根 — 唯一真相源 | `configs/agentrt.yaml`（v0.1.1 统一运行时配置） |
+| **manager** | 配置根 — 唯一真相源 | `configs/agentrt.yaml`（统一运行时配置） |
 | **prompts** | 提示词工程 — 模板 + 评估 | `registry.yaml` + tuner 框架 |
 | **markets** | 分发 — 可安装包 + 市场客户端 | `tools/maths-toolkit/` + `client/` |
 | **skills** | 可复用能力 — 官方技能包 | 5 个 `SkillPlugin` 子类 + 5 个 C 插件 |
@@ -90,7 +90,7 @@ ecosystem/                 # 管理仓（本仓库）
 
 > **注意**：官方 Hook 集合（原 `ecosystem/hooks/`）已于 SP09.3 迁移至 `sdk-python/agentrt/hooks/`，import 路径变更为 `from agentrt.hooks import ...`。
 
-### 0.1.1 生态层进展（与 agentrt 框架化联动）
+### 生态层进展（与 agentrt 框架化联动）
 
 - **Agent 可被真实驱动**：agentrt 工作大厅（Work Hall）以 `agent:<role>` handler 注册任务图节点，经 `agent_d` spawn/invoke 驱动本层 `agents/` 下的 Agent 执行（含 Rust `coding_rs_v1`）。
 - **Rust coding agent 接入 LLM**：`agents/airymax_agents_rs` 的 `coding_agent`（v0.2.0）支持 OpenAI 兼容协议 + Mock 降级，与 Python 实现的延迟对比基准位于 `agents/tests/`。
