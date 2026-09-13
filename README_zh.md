@@ -39,11 +39,11 @@ ecosystem/                 # 管理仓（本仓库）
 
 | 模块 | 目录 | 仓库 URL | 说明 |
 |------|------|----------|------|
-| **manager** | `manager/` | `git@atomgit.com:openairymax/manager.git` | 统一配置与生命周期管理中心 — 11 个 JSON Schema（~272 条规则）、10 个已注册技能、12 个已注册 Agent、3 套环境覆盖层（dev/staging/prod）、sanitizer 抑制文件、安全策略、部署模板 |
+| **manager** | `manager/` | `git@atomgit.com:openairymax/manager.git` | 统一配置与生命周期管理中心 — 12 个 JSON Schema、15 个已注册技能、14 个已注册 Agent（12 个已实现 + 2 个已规划）、3 套环境覆盖层（dev/staging/prod）、sanitizer 抑制文件、输入安全规则、安全策略、部署模板 |
 | **prompts** | `prompts/` | `git@atomgit.com:openairymax/prompts.git` | 官方提示词模板库 — 4 类共 14 个模板（Cognition / Memory / Security / System）、registry、tuner 框架（评分器 / 评估器 / A-B 测试） |
 | **markets** | `markets/` | `git@atomgit.com:openairymax/markets.git` | 官方分发包市场 — 可安装 `tool` 包（如 `maths-toolkit`）、市场客户端 SDK、Agent/技能契约校验器与安装器、包模板、参考示例 Agent 与应用 |
-| **skills** | `skills/` | `git@atomgit.com:openairymax/skills.git` | 官方技能 — 5 个 Python `SkillPlugin` 技能（code_review / text_summarization / security_audit / data_analysis / web_search）、5 个 C 插件实现、3 个社区贡献技能（browser / database / github）、技能市场契约校验器与安装器 |
-| **agents** | `agents/` | `git@atomgit.com:openairymax/agents.git` | 内置 Agent 执行器 — 11 个角色 Agent（product_manager / architect / backend / frontend / devops / security / tester / coding / data_engineer / reviewer / analyst）+ Rust coding agent；每个含 `contract.json` + `prompts/system.md` + `AirymaxAgent` 子类；**编排框架**（Agent / Task / Tool / Storage / LLMClient + 调度与规划策略）由原 `openlab` 叶子仓并入；无 API Key 亦可 Mock 端到端运行 |
+| **skills** | `skills/` | `git@atomgit.com:openairymax/skills.git` | 官方技能 — 5 个 Python `SkillPlugin` 技能（code_review / text_summarization / security_audit / data_analysis / web_search）、5 个 C 插件实现、3 个社区贡献技能（browser / database / github）；经 `markets/` 分发 |
+| **agents** | `agents/` | `git@atomgit.com:openairymax/agents.git` | 内置 Agent 执行器 — 11 个 Python 角色 Agent（product_manager / architect / backend / frontend / devops / security / tester / coding / data_engineer / reviewer / analyst）+ 1 个 Rust coding agent；每个含 `contract.json` + `prompts/system.md` + `AirymaxAgent` 子类；**编排框架**（Agent / Task / Tool / Storage / LLMClient + 调度与规划策略）；无 API Key 亦可 Mock 端到端运行 |
 
 ## 生态架构
 
@@ -73,7 +73,7 @@ ecosystem/                 # 管理仓（本仓库）
 | **prompts** | 提示词工程 — 模板 + 评估 | `registry.yaml` + tuner 框架 |
 | **markets** | 分发 — 可安装包 + 市场客户端 | `tools/maths-toolkit/` + `client/` |
 | **skills** | 可复用能力 — 官方技能包 | 5 个 `SkillPlugin` 子类 + 5 个 C 插件 |
-| **agents** | 内置执行器 + 编排内核 | 11 个角色 Agent + `orchestration/` 框架 |
+| **agents** | 内置执行器 + 编排内核 | 11 个 Python 角色 Agent + Rust coding agent + `orchestration/` 框架 |
 
 ### 上游依赖
 
@@ -85,16 +85,16 @@ ecosystem/                 # 管理仓（本仓库）
 
 - **Agent 开发者** — 使用 `prompts/` 和 `skills/` 作为构建块；从 `markets/` 安装分发包；通过 `manager/` 配置部署
 - **运维人员** — 使用 `manager/` 部署模板和监控配置进行生产环境部署
-- **运行时** — `market_d` 从 `markets/` 解析分发包；`agent_d` 驱动 `agents/` 的执行器；`tool_d`（M4 吸收 `plugin_d`）加载 `skills/plugins/` 的技能插件
+- **运行时** — `market_d` 从 `markets/` 解析分发包；`agent_d` 驱动 `agents/` 的执行器；`tool_d` 加载 `skills/plugins/` 的技能插件
 - **CI / CD 流水线** — 运行 `manager/tools/drift_detector.py` 和 `manager/tools/config_diff.py` 作为配置验证门禁
 
-> **注意**：官方 Hook 集合（原 `ecosystem/hooks/`）已于 SP09.3 迁移至 `sdk-python/agentrt/hooks/`，import 路径变更为 `from agentrt.hooks import ...`。
+> **注意**：官方 Hook 集合由 SDK 提供（`from agentrt.hooks import ...`），不在本仓库中。
 
-### 生态层进展（与 agentrt 框架化联动）
+### 关键能力
 
-- **Agent 可被真实驱动**：agentrt 工作大厅（Work Hall）以 `agent:<role>` handler 注册任务图节点，经 `agent_d` spawn/invoke 驱动本层 `agents/` 下的 Agent 执行（含 Rust `coding_rs_v1`）。
-- **Rust coding agent 接入 LLM**：`agents/airymax_agents_rs` 的 `coding_agent`（v0.2.0）支持 OpenAI 兼容协议 + Mock 降级，与 Python 实现的延迟对比基准位于 `agents/tests/`。
-- **LLM 配置 SSoT 收敛**：`manager/model/model.yaml`（同源 `model.json`）为提供商/模型唯一真相源（含 `providers` 段）；`manager/configs/agentrt.yaml` 的 `llm` 段仅保留运行时策略（路由/成本/缓存）。
+- **Agent 端到端可驱动**：运行时经 `agent_d` spawn/invoke 驱动 `agents/` 下的执行器，含 Rust `coding_rs_v1`。
+- **Rust coding agent 接入 LLM**：`agents/airymax_agents_rs` 的 `coding_agent` crate 支持 OpenAI 兼容协议 + Mock 降级，与 Python 实现的延迟对比基准位于 `agents/tests/`。
+- **LLM 配置 SSoT 收敛**：`manager/model/model.yaml`（同源 `model.json`）为模型配置唯一真相源 —— `models` 连接表 + `default_model` + `think` 角色映射；`manager/configs/agentrt.yaml` 的 `llm` 段仅保留运行时策略（路由 / 成本 / 缓存）。
 
 ## 构建与使用
 
@@ -118,24 +118,14 @@ validate(instance=config, schema=schema)
 # 运行运维工具集（manager/）
 python manager/tools/src/drift_detector.py --action both --output drift_report.json
 
-# 运行示例 Agent（markets/examples/）
+# 运行内置 Agent 端到端示例（agents/，自动启用 Mock 模式）
+python agents/examples/run_pm.py
+
+# 运行市场示例 Agent（markets/）
 cd markets/examples/hello-agent && python main.py
 
 # 运行技能测试（skills/）
 python -m pytest skills/tests/ -v
-```
-
-## 分支策略
-
-- **本管理仓** — 仅 `main` 分支。不在此创建 feature 分支。
-- **叶子仓** — 活跃开发在 `develop/hubs-01` 分支上进行。各叶子仓的 `main` 分支跟踪最近一次稳定发布。
-
-克隆本仓库（含 submodule）：
-
-```bash
-git clone --recurse-submodules git@atomgit.com:openairymax/ecosystem.git
-cd ecosystem
-git submodule update --remote --checkout
 ```
 
 ## 许可证
@@ -156,7 +146,5 @@ git submodule update --remote --checkout
 | 构建**企业内部工具** | **Apache 2.0** | 无需公开源代码 |
 | 需要**专利保护** | **Apache 2.0** | 贡献者明确授予专利使用权 |
 | 仅用于学习与研究 | **任一** | 两者均允许个人使用 |
-
-权威许可证政策见 [12-license-policy.md](../docs/AirymaxOS/50-engineering-standards/12-license-policy.md)。
 
 Copyright (c) 2025-2026 SPHARX Ltd. All Rights Reserved.
