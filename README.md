@@ -39,11 +39,11 @@ ecosystem/                 # Management repository (this repo)
 
 | Module | Directory | Repository URL | Description |
 |--------|-----------|----------------|-------------|
-| **manager** | `manager/` | `git@atomgit.com:openairymax/manager.git` | Unified configuration & lifecycle management center — 11 JSON Schemas (~272 rules), 15 registered skills, 14 registered agents, 3 environment overlays (dev/staging/prod), sanitizer suppressions, security policies, deployment templates |
+| **manager** | `manager/` | `git@atomgit.com:openairymax/manager.git` | Unified configuration & lifecycle management center — 12 JSON Schemas, 15 registered skills, 14 registered agents (12 implemented + 2 planned), 3 environment overlays (dev/staging/prod), sanitizer suppressions, input-security rules, security policies, deployment templates |
 | **prompts** | `prompts/` | `git@atomgit.com:openairymax/prompts.git` | Official prompt template library — 14 templates across 4 categories (Cognition / Memory / Security / System), registry, tuner framework (scorer / evaluator / A-B testing) |
 | **markets** | `markets/` | `git@atomgit.com:openairymax/markets.git` | Official package marketplace — installable `tool` packages (e.g. `maths-toolkit`), marketplace client SDK, agent/skill contract validators & installers, package templates, reference example agents & applications |
 | **skills** | `skills/` | `git@atomgit.com:openairymax/skills.git` | Official skills — 5 Python `SkillPlugin` skills (code_review / text_summarization / security_audit / data_analysis / web_search), 5 C plugin implementations, 3 contrib skills (browser / database / github); distribution via `markets/` |
-| **agents** | `agents/` | `git@atomgit.com:openairymax/agents.git` | Built-in agent executors — 11 role agents (product_manager / architect / backend / frontend / devops / security / tester / coding / data_engineer / reviewer / analyst) + Rust coding agent; each ships `contract.json` + `prompts/system.md` + `AirymaxAgent` subclass; **orchestration** framework (Agent / Task / Tool / Storage / LLMClient + dispatching & planning strategies); mock-runnable end-to-end without API key |
+| **agents** | `agents/` | `git@atomgit.com:openairymax/agents.git` | Built-in agent executors — 11 Python role agents (product_manager / architect / backend / frontend / devops / security / tester / coding / data_engineer / reviewer / analyst) + 1 Rust coding agent; each ships `contract.json` + `prompts/system.md` + an `AirymaxAgent` subclass; **orchestration** framework (Agent / Task / Tool / Storage / LLMClient + dispatching & planning strategies); mock-runnable end-to-end without API key |
 
 ## Ecosystem Architecture
 
@@ -73,7 +73,7 @@ Each leaf repository plays a distinct role within the ecosystem layer:
 | **prompts** | Prompt engineering — templates + evaluation | `registry.yaml` + tuner framework |
 | **markets** | Distribution — installable packages + marketplace client | `tools/maths-toolkit/` + `client/` |
 | **skills** | Reusable capabilities — official skill pack | 5 `SkillPlugin` subclasses + 5 C plugins |
-| **agents** | Built-in executors + orchestration kernel | 11 role agents + `orchestration/` framework |
+| **agents** | Built-in executors + orchestration kernel | 11 Python role agents + Rust coding agent + `orchestration/` framework |
 
 ### Upstream Dependencies
 
@@ -85,16 +85,16 @@ Each leaf repository plays a distinct role within the ecosystem layer:
 
 - **Agent developers** — use `prompts/` and `skills/` as building blocks; install packages from `markets/`; deploy via `manager/` configs
 - **Operators** — use `manager/` deployment templates and monitoring configs for production rollouts
-- **Runtime** — `market_d` resolves packages from `markets/`; `agent_d` drives executors from `agents/`; `tool_d` loads skill plugins from `skills/plugins/` (M4 absorbed `plugin_d`)
+- **Runtime** — `market_d` resolves packages from `markets/`; `agent_d` drives executors from `agents/`; `tool_d` loads skill plugins from `skills/plugins/`
 - **CI / CD pipelines** — run `manager/tools/drift_detector.py` and `manager/tools/config_diff.py` as configuration validation gates
 
-> **Note**: The official Hooks collection (formerly `ecosystem/hooks/`) was migrated to `sdk-python/agentrt/hooks/` during SP09.3. Import path changed to `from agentrt.hooks import ...`.
+> **Note**: Official hooks are provided by the SDK (`from agentrt.hooks import ...`) rather than by this repository.
 
-### Ecosystem Progress (Linked with AgentRT Framework-ization)
+### Key Capabilities
 
-- **Agents can be truly driven**: the agentrt Work Hall registers task-graph nodes as `agent:<role>` handlers and spawns/invokes this layer's `agents/` via `agent_d` (including Rust `coding_rs_v1`).
-- **Rust coding agent with LLM**: `agents/airymax_agents_rs` `coding_agent` (v0.2.0) supports the OpenAI-compatible protocol with a Mock fallback; latency benchmarks vs the Python implementation live under `agents/tests/`.
-- **LLM config SSoT consolidation**: `manager/model/model.yaml` (kept in sync with `model.json`) is the single source of truth for providers/models (with a `providers` section); the `llm` section in `manager/configs/agentrt.yaml` keeps only runtime policy (routing/cost/cache).
+- **Agents driven end-to-end**: the runtime spawns and invokes the executors in `agents/` through `agent_d`, including the Rust `coding_rs_v1`.
+- **Rust coding agent with LLM support**: the `coding_agent` crate in `agents/airymax_agents_rs` speaks the OpenAI-compatible protocol with a Mock fallback; latency benchmarks against the Python implementation live under `agents/tests/`.
+- **LLM configuration SSoT**: `manager/model/model.yaml` (kept in sync with `model.json`) is the single source of truth for model configuration — a `models` connection table plus `default_model` and the `think` role mapping; the `llm` section in `manager/configs/agentrt.yaml` keeps only runtime policy (routing / cost / cache).
 
 ## Build & Usage
 
@@ -121,21 +121,11 @@ python manager/tools/src/drift_detector.py --action both --output drift_report.j
 # Run a built-in agent end-to-end (agents/, mock mode auto-enabled)
 python agents/examples/run_pm.py
 
+# Run the marketplace example agent (markets/)
+cd markets/examples/hello-agent && python main.py
+
 # Run skill tests (skills/)
 python -m pytest skills/tests/ -v
-```
-
-## Branch Strategy
-
-- **This management repo** — `main` only. No feature branches are created here.
-- **Leaf repositories** — active development happens on `develop/hubs-01`. The `main` branch on each leaf repo tracks the last stable release.
-
-When cloning this repo with submodules:
-
-```bash
-git clone --recurse-submodules git@atomgit.com:openairymax/ecosystem.git
-cd ecosystem
-git submodule update --remote --checkout
 ```
 
 ## License
@@ -156,7 +146,5 @@ You may choose **either** license at your option — not both, not neither.
 | Building **enterprise internal tools** | **Apache 2.0** | No source disclosure required |
 | Needing **patent protection** | **Apache 2.0** | Explicit patent grant from contributors |
 | Just learning or researching | **Either** | Both permit personal use |
-
-For the authoritative license policy, see [12-license-policy.md](../docs/AirymaxOS/50-engineering-standards/12-license-policy.md).
 
 Copyright (c) 2025-2026 SPHARX Ltd. All Rights Reserved.
