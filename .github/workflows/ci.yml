@@ -1,0 +1,86 @@
+name: CI
+
+# ecosystem 是策略载荷仓（agents/markets/prompts/skills/manager 五模块）。
+# 流水线体系 L1 仓内快速门禁（agentrt release.yml 同体系分层）：
+#   validate —— 零依赖语法与结构门禁：全模块 compileall + YAML/JSON
+#               全量解析 + 五模块 tests/ 存在性（防测试面被静默删除）。
+#   pytest   —— 策略载荷真实测试面：五模块各自 rootdir 下全量 pytest
+#              （模块内相对导入依赖模块级 sys.path，故逐模块 cd 运行）。
+# 作业数 ≤3 是本仓流水线判据（1 失败域 = 1 作业）；纯文档变更跳过。
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '*.md'
+      - '**/*.md'
+      - 'docs/**'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile all modules (syntax gate)
+        run: |
+          python3 -m compileall -q agents markets prompts skills manager
+      - name: Parse all YAML/JSON payloads
+        run: |
+          pip install pyyaml --quiet
+          python3 - <<'EOF'
+          import glob, json, sys
+          import yaml
+          bad = []
+          for f in glob.glob('**/*.yaml', recursive=True) + glob.glob('**/*.yml', recursive=True):
+              if '.github/' in f:
+                  continue
+              try:
+                  yaml.safe_load(open(f, encoding='utf-8'))
+              except Exception as e:
+                  bad.append(f'{f}: {e}')
+          for f in glob.glob('**/*.json', recursive=True):
+              try:
+                  json.load(open(f, encoding='utf-8'))
+              except Exception as e:
+                  bad.append(f'{f}: {e}')
+          if bad:
+              print('\n'.join(bad), file=sys.stderr)
+              sys.exit(1)
+          print('[OK] all yaml/json payloads parse')
+          EOF
+      - name: Test suites must exist (fail-closed)
+        run: |
+          for m in agents markets prompts skills manager; do
+            [ -d "$m/tests" ] || { echo "::error::$m/tests missing"; exit 1; }
+          done
+          echo '[OK] five module test suites present'
+
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install test dependencies
+        run: |
+          pip install pytest pyyaml pytest-asyncio --quiet
+      - name: Run all module suites
+        run: |
+          set -o pipefail
+          rc=0
+          for m in agents markets prompts skills manager; do
+            echo "::group::pytest $m"
+            (cd "$m" && python3 -m pytest -q 2>&1 | tail -25) || rc=1
+            echo "::endgroup::"
+          done
+          exit $rc
