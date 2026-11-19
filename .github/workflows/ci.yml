@@ -31,6 +31,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Compile all modules (syntax gate)
         run: |
           python3 -m compileall -q agents markets prompts skills manager
@@ -71,6 +73,8 @@ jobs:
     needs: validate
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Install test dependencies
         run: |
           pip install pytest pyyaml pytest-asyncio --quiet
