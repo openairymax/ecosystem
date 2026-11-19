@@ -81,6 +81,10 @@ jobs:
       - name: Install test dependencies
         run: |
           pip install pytest pyyaml pytest-asyncio --quiet
+      - name: Install agentrt python bindings
+        # skills 模块的运行时契约引用 agentrt.plugin_types（机制核 Python
+        # 绑定，SSoT 在 sdk 仓 sdk-python 模块）；独仓组装下按主线安装。
+        run: pip install "agentrt @ git+https://github.com/openairymax/sdk-python@main" --quiet
       - name: Run all module suites
         run: |
           set -o pipefail
