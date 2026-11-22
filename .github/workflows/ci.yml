@@ -119,7 +119,7 @@ jobs:
           rc=0
           for m in agents manager markets skills; do
             echo "::group::pytest $m"
-            (cd "$m" && python3 -m pytest -q 2>&1 | tail -25) || rc=1
+            (cd "$m" && python3 -m pytest -q 2>&1 | tail -120) || rc=1
             echo "::endgroup::"
           done
           exit $rc
