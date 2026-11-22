@@ -34,8 +34,22 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+      - name: Checkout submodules (mirror-lag tolerant)
+        # 子模块指针指向 atomgit 同步到 GitHub 的提交，同步有秒级延迟；
+        # 单次固定 checkout 会被镜像滞后误伤（2026-11-22 59b261b 即此）。
+        # 限定次数重试，耗尽仍硬失败，不掩盖真的缺提交。
+        run: |
+          for attempt in 1 2 3 4 5 6; do
+            git submodule sync --recursive
+            if git submodule update --init --recursive --jobs 4; then
+              echo "[OK] submodules at pinned commits (attempt ${attempt})"
+              exit 0
+            fi
+            echo "::warning::submodule checkout failed (attempt ${attempt}/6)"
+            sleep 20
+          done
+          echo "::error::submodules unavailable after 6 attempts"
+          exit 1
       - name: Compile all modules (syntax gate)
         run: |
           python3 -m compileall -q agents markets prompts skills manager
@@ -76,8 +90,19 @@ jobs:
     needs: validate
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+      - name: Checkout submodules (mirror-lag tolerant)
+        run: |
+          for attempt in 1 2 3 4 5 6; do
+            git submodule sync --recursive
+            if git submodule update --init --recursive --jobs 4; then
+              echo "[OK] submodules at pinned commits (attempt ${attempt})"
+              exit 0
+            fi
+            echo "::warning::submodule checkout failed (attempt ${attempt}/6)"
+            sleep 20
+          done
+          echo "::error::submodules unavailable after 6 attempts"
+          exit 1
       - name: Install test dependencies
         run: |
           pip install pytest pyyaml pytest-asyncio --quiet
